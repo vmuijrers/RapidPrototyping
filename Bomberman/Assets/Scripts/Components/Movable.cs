@@ -6,11 +6,18 @@ public class Movable : MonoBehaviour
 {
     [SerializeField] private float moveSpeed;
     private Vector3 inputDirection;
+    private Rigidbody rigidbody;
+
+    private void Awake()
+    {
+        rigidbody = GetComponent<Rigidbody>();
+    }
 
     // Update is called once per frame
-    private void Update()
+    private void FixedUpdate()
     {
-        transform.position += inputDirection.normalized * moveSpeed * Time.deltaTime;
+        rigidbody.MovePosition(rigidbody.position + inputDirection.normalized * moveSpeed * Time.fixedDeltaTime);
+        //transform.position += inputDirection.normalized * moveSpeed * Time.deltaTime;
         inputDirection = Vector3.zero;
     }
 

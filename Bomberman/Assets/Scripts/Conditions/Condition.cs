@@ -47,7 +47,7 @@ public class FloatHolder
                 var bb = target.GetComponent<BlackBoard>();
                 if(bb != null)
                 {
-                    var floatVar = bb.GetValueByName(blackBoardVariableName);
+                    var floatVar = bb.GetValueByName<FloatVariable>(blackBoardVariableName);
                     if(floatVar != null)
                     {
                         return floatVar.Value;

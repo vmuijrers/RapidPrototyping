@@ -4,37 +4,79 @@ using UnityEngine;
 
 public class BlackBoard : MonoBehaviour
 {
-    [SerializeField] private List<DataDummyHolder> data = new List<DataDummyHolder>();
-    private Dictionary<string, FloatVariable> blackBoard = new Dictionary<string, FloatVariable>();
+    [SerializeReference][SerializeField] private List<BaseDataClass> data = new List<BaseDataClass>();
+    private Dictionary<string, ScriptableObject> blackBoard = new Dictionary<string, ScriptableObject>();
 
     private void Awake()
     {
-        blackBoard = new Dictionary<string, FloatVariable>();
-        foreach (DataDummyHolder d in data)
+        blackBoard = new Dictionary<string, ScriptableObject>();
+        foreach (BaseDataClass d in data)
         {
-            var fVariable = ScriptableObject.CreateInstance<FloatVariable>();
-            fVariable.SetValue(d.value);
-            fVariable.OnValueChanged = d.OnValueChanged;
-            fVariable.OnValueChanged.AddListener((x) => d.value = x);
-            blackBoard.Add(d.variableName, fVariable);
+            var result = d.ConvertDummyToVariable();
+            blackBoard.Add(d.variableName, result);
         }
     }
 
-    public FloatVariable GetValueByName(string name)
+    public T GetValueByName<T>(string name) where T : ScriptableObject
     {
         if (blackBoard.ContainsKey(name))
         {
-            return blackBoard[name];
+            return blackBoard[name] as T;
         }
         Debug.LogWarning($"Variable {name} was not found in the blackboard dictionary!");
         return null;
     }
+
+    [ContextMenu("AddFloatVariable")]
+    public void AddFloatValue()
+    {
+        data.Add(new FloatDataDummy());
+    }
+
+    [ContextMenu("AddGameObjectVariable")]
+    public void AddGameObjectValue()
+    {
+        data.Add(new GameObjectDataDummy());
+    }
+
 }
 
 [System.Serializable]
-public class DataDummyHolder
+public abstract class BaseDataClass
 {
     public string variableName;
+
+    public abstract ScriptableObject ConvertDummyToVariable();
+}
+
+[System.Serializable]
+public class FloatDataDummy : BaseDataClass
+{
     public float value;
     public UnityEngine.Events.UnityEvent<float> OnValueChanged;
+
+    public override ScriptableObject ConvertDummyToVariable()
+    {
+        FloatVariable fVariable = ScriptableObject.CreateInstance<FloatVariable>();
+        fVariable.Value = value;
+        fVariable.OnValueChanged = OnValueChanged;
+        fVariable.OnValueChanged.AddListener((x) => value = x);
+        return fVariable;
+    }
+}
+
+[System.Serializable]
+public class GameObjectDataDummy : BaseDataClass
+{
+    public GameObject value;
+    public UnityEngine.Events.UnityEvent<GameObject> OnValueChanged;
+
+    public override ScriptableObject ConvertDummyToVariable()
+    {
+        GameObjectVariable fVariable = ScriptableObject.CreateInstance<GameObjectVariable>();
+        fVariable.Value = value;
+        fVariable.OnValueChanged = OnValueChanged;
+        fVariable.OnValueChanged.AddListener((x) => value = x);
+        return fVariable;
+    }
 }

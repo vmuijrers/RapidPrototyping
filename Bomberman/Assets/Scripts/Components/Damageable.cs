@@ -8,7 +8,7 @@ public class Damageable : MonoBehaviour
     private FloatVariable HealthVariable;
     private void Start()
     {
-        HealthVariable = GetComponent<BlackBoard>().GetValueByName("Health");
+        HealthVariable = GetComponent<BlackBoard>().GetValueByName<FloatVariable>("Health");
     }
 
     public void OnTakeDamage(float damage)

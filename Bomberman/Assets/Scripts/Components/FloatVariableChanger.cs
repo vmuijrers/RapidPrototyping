@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class VariableChanger : MonoBehaviour
+public class FloatVariableChanger : MonoBehaviour
 {
     public string variableName;
     public float amount;
@@ -9,14 +9,14 @@ public class VariableChanger : MonoBehaviour
     {
         target
             .GetComponent<BlackBoard>()?
-            .GetValueByName(variableName)?
+            .GetValueByName<FloatVariable>(variableName)?
             .AddValue(amount);
     }
 
     public void ChangeVariableSelf()
     {
         GetComponent<BlackBoard>()?
-        .GetValueByName(variableName)?
+        .GetValueByName<FloatVariable>(variableName)?
         .AddValue(amount);
     }
 }
